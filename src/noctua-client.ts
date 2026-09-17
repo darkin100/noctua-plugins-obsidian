@@ -75,9 +75,11 @@ export class NoctuaClient {
     if (response.status >= 400) {
       let detail: string | undefined;
       try {
-        const parsed = response.json;
-        detail =
-          typeof parsed?.detail === 'string' ? parsed.detail : undefined;
+        const parsed: unknown = response.json;
+        if (parsed && typeof parsed === 'object' && 'detail' in parsed) {
+          const value = (parsed as { detail?: unknown }).detail;
+          detail = typeof value === 'string' ? value : undefined;
+        }
       } catch {
         // non-JSON error body — fall through to the generic message
       }

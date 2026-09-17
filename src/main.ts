@@ -209,10 +209,13 @@ export default class NoctuaPlugin extends Plugin {
 
     if (writeBack) {
       try {
-        await this.app.fileManager.processFrontMatter(file, (fm) => {
-          fm.noctua_id = conversion.id;
-          if (shareUrl) fm.noctua_url = shareUrl;
-        });
+        await this.app.fileManager.processFrontMatter(
+          file,
+          (fm: Record<string, unknown>) => {
+            fm.noctua_id = conversion.id;
+            if (shareUrl) fm.noctua_url = shareUrl;
+          }
+        );
       } catch {
         // Read-only file or parse issue — don't fail the whole send.
       }
@@ -246,5 +249,5 @@ function isTransient(error: unknown): boolean {
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
