@@ -30,10 +30,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/darkin100/obsidian-noctua.git"
+    "url": "git+https://github.com/darkin100/noctua-plugins-obsidian.git"
   },
   "bugs": {
-    "url": "https://github.com/darkin100/obsidian-noctua/issues"
+    "url": "https://github.com/darkin100/noctua-plugins-obsidian/issues"
   },
-  "homepage": "https://github.com/darkin100/obsidian-noctua#readme"
+  "homepage": "https://github.com/darkin100/noctua-plugins-obsidian#readme"
 }
