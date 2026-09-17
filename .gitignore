@@ -1,0 +1,8 @@
+node_modules/
+main.js
+*.map
+.DS_Store
+
+# Local plugin settings written by Obsidian when the repo is used as a
+# live plugin folder inside a vault. Never commit it: it holds real settings.
+data.json

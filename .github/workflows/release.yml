@@ -1,0 +1,48 @@
+name: Release
+
+# Obsidian installs plugins from GitHub release assets, so a release must
+# attach the built main.js alongside manifest.json. The tag must match
+# manifest.json's version exactly, with no "v" prefix (e.g. 0.1.0).
+on:
+  push:
+    tags: ['*']
+
+jobs:
+  release:
+    name: Build and draft release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify tag matches manifest version
+        run: |
+          manifest_version=$(node -p "require('./manifest.json').version")
+          if [ "$manifest_version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest.json version $manifest_version"
+            exit 1
+          fi
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Type-check and build
+        run: npm run build
+
+      - name: Create draft release
+        run: gh release create "$GITHUB_REF_NAME" --draft --title "$GITHUB_REF_NAME" --generate-notes main.js manifest.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

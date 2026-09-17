@@ -1,1 +1,54 @@
-# noctua-plugins-obsidian
+# Noctua for Obsidian
+
+Send any note (or selection) to [Noctua](https://noctua.uno) and listen to it later as an episode in your personal podcast feed.
+
+## What it does
+
+- **Send note to your podcast feed** — command, ribbon icon, or right-click a note in the file explorer
+- **Send selection to your podcast feed** — convert just the highlighted text
+- Shows progress while Noctua prepares the audio, and confirms when the episode is in your feed
+- Optionally writes `noctua_id` and `noctua_url` into the note's frontmatter so the same note isn't sent twice by accident
+- Works on desktop and mobile
+
+## Setup
+
+1. Sign in at [cast.noctua.uno](https://cast.noctua.uno) and open **Settings → API keys**
+2. Create a key (e.g. labelled "Obsidian") and copy it — it is shown only once
+3. In Obsidian, open **Settings → Noctua** and paste the key
+4. Use **Test connection** to confirm it works and see your remaining credits
+
+## Network use & privacy disclosure
+
+This plugin sends data to the Noctua API (`api.cast.noctua.uno`) — this is its entire purpose and it only happens when you explicitly trigger a send:
+
+- **What is sent**: the content of the note (or selection) you choose to send, its title, and an `obsidian://` link containing your vault name and the note's path (stored with the episode to identify its source; it is not included in your podcast RSS feed or on public share pages)
+- **When**: only when you run a send command; nothing is sent in the background
+- **Telemetry**: none — the plugin collects no analytics or usage data
+
+A **Noctua account is required**, and each conversion consumes one Noctua credit (new accounts include free credits; more can be purchased). See Noctua's [privacy policy](https://noctua.uno/privacy/) and [terms](https://noctua.uno/terms/).
+
+Your API key is stored using Obsidian's secret storage when available (Obsidian 1.11.4+), and a key saved by an older version is moved there automatically. On older Obsidian versions it falls back to the plugin's local `data.json` — be aware that file is inside your vault folder and may be included in vault syncs and backups.
+
+## Development
+
+```bash
+npm install
+npm run dev      # esbuild watch mode
+npm test         # vitest unit tests
+npm run build    # type-check + production bundle (main.js)
+```
+
+To test in a vault, copy `manifest.json` and the built `main.js` into `<vault>/.obsidian/plugins/noctua/`, then enable the plugin in **Settings → Community plugins**.
+
+### Releasing
+
+`npm version <patch|minor|major>` bumps `package.json`, `manifest.json` and `versions.json` together. Push the tag (no `v` prefix, so it matches `manifest.json`) and the release workflow builds and drafts a GitHub release with `main.js` and `manifest.json` attached:
+
+```bash
+npm version patch
+git push && git push --tags
+```
+
+## License
+
+MIT
