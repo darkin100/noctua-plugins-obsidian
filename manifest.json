@@ -1,7 +1,7 @@
 {
   "id": "noctua",
   "name": "Noctua",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "minAppVersion": "1.13.0",
   "description": "Send notes to Noctua to be converted into audio episodes in your personal podcast feed.",
   "author": "Glyn Darkin",
