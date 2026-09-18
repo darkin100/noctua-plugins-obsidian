@@ -8,7 +8,7 @@ type PluginData = Record<string, unknown> & { apiKey?: string };
 /**
  * Store and retrieve the Noctua API key in the app's secret storage, which
  * keeps it out of data.json (that file lives in the vault and syncs with it).
- * Requires Obsidian 1.11.4+, which manifest.json declares as the minimum.
+ * Requires Obsidian 1.11.4+; manifest.json declares a higher minimum still.
  */
 export class ApiKeyStore {
   constructor(private readonly plugin: Plugin) {}

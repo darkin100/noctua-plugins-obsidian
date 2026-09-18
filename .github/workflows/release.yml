@@ -14,6 +14,10 @@ jobs:
 
     permissions:
       contents: write
+      # Required to sign the build provenance attestation, which lets users
+      # cryptographically verify main.js was built from this repository.
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout
@@ -41,6 +45,11 @@ jobs:
 
       - name: Type-check and build
         run: npm run build
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: main.js
 
       - name: Create draft release
         run: gh release create "$GITHUB_REF_NAME" --draft --title "$GITHUB_REF_NAME" --generate-notes main.js manifest.json

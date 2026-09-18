@@ -8,7 +8,7 @@ Send any note (or selection) to [Noctua](https://noctua.uno) and listen to it la
 - **Send selection to your podcast feed** — convert just the highlighted text
 - Shows progress while Noctua prepares the audio, and confirms when the episode is in your feed
 - Optionally writes `noctua_id` and `noctua_url` into the note's frontmatter so the same note isn't sent twice by accident
-- Works on desktop and mobile (requires Obsidian 1.11.4+)
+- Works on desktop and mobile (requires Obsidian 1.13.0+)
 
 ## Setup
 
@@ -27,7 +27,7 @@ This plugin sends data to the Noctua API (`api.cast.noctua.uno`) — this is its
 
 A **Noctua account is required**, and each conversion consumes one Noctua credit (new accounts include free credits; more can be purchased). See Noctua's [privacy policy](https://noctua.uno/privacy/) and [terms](https://noctua.uno/terms/).
 
-Your API key is stored in Obsidian's secret storage, so it is never written to the plugin's `data.json` inside your vault and is not picked up by vault syncs or backups. This is why the plugin requires Obsidian 1.11.4 or later; a key saved by an earlier plugin version is migrated into secret storage and removed from `data.json` on first run.
+Your API key is stored in Obsidian's secret storage, so it is never written to the plugin's `data.json` inside your vault and is not picked up by vault syncs or backups. Secret storage needs Obsidian 1.11.4+, and the plugin's settings use the declarative settings API added in 1.13.0, so 1.13.0 is the minimum supported version. A key saved by an earlier plugin version is migrated into secret storage and removed from `data.json` on first run.
 
 ## Development
 
