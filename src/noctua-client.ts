@@ -1,4 +1,4 @@
-import { requestUrl } from 'obsidian';
+import { requestUrl, RequestUrlResponse } from 'obsidian';
 
 export interface NoctuaClientConfig {
   baseUrl: string;
@@ -8,10 +8,17 @@ export interface NoctuaClientConfig {
 export interface Conversion {
   id: string;
   title: string | null;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'expired';
   progressPercentage: number;
   progressMessage: string | null;
   errorMessage: string | null;
+  sourceUrl?: string;
+  createdAt?: string;
+}
+
+export interface ConversionList {
+  items: Conversion[];
+  total: number;
 }
 
 export interface CreditBalance {
@@ -53,6 +60,15 @@ export class NoctuaClient {
     path: string,
     body?: unknown
   ): Promise<T> {
+    const response = await this.send(method, path, body);
+    return response.json as T;
+  }
+
+  private async send(
+    method: string,
+    path: string,
+    body?: unknown
+  ): Promise<RequestUrlResponse> {
     const { baseUrl, apiKey } = this.getConfig();
     if (!apiKey) {
       throw new NoctuaApiError(
@@ -86,7 +102,7 @@ export class NoctuaClient {
       throw new NoctuaApiError(friendlyMessage(response.status, detail), response.status);
     }
 
-    return response.json as T;
+    return response;
   }
 
   /** Submit text for conversion. Costs one credit. */
@@ -114,6 +130,23 @@ export class NoctuaClient {
       `/conversions/${id}/share`
     );
     return data.shareUrl;
+  }
+
+  /** Most recent conversions, newest first. */
+  listConversions(limit = 100): Promise<ConversionList> {
+    return this.request<ConversionList>('GET', `/conversions/?limit=${limit}`);
+  }
+
+  /**
+   * Plain-text transcript of a conversion. Available once the content has
+   * been extracted, and still available after the audio expires.
+   */
+  async getTranscript(id: string): Promise<string> {
+    const response = await this.send(
+      'GET',
+      `/conversions/${encodeURIComponent(id)}/transcript?format=text`
+    );
+    return response.text;
   }
 
   /** Credit balance — also doubles as a connection/key test. */

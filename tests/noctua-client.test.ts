@@ -133,4 +133,55 @@ describe('NoctuaClient', () => {
       })
     );
   });
+
+  it('downloads the plain-text transcript', async () => {
+    mockRequestUrl.mockResolvedValue({
+      status: 200,
+      text: 'First paragraph.\n\nSecond paragraph.',
+      get json(): unknown {
+        throw new Error('not json');
+      },
+    });
+
+    const transcript = await makeClient().getTranscript('c-1');
+
+    expect(transcript).toBe('First paragraph.\n\nSecond paragraph.');
+    expect(mockRequestUrl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://api.cast.noctua.uno/api/v1/conversions/c-1/transcript?format=text',
+        method: 'GET',
+      })
+    );
+  });
+
+  it('surfaces a missing transcript as a 404', async () => {
+    mockRequestUrl.mockResolvedValue({
+      status: 404,
+      json: { detail: 'Transcript not available' },
+    });
+
+    const error = await makeClient()
+      .getTranscript('c-1')
+      .catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(NoctuaApiError);
+    expect((error as NoctuaApiError).status).toBe(404);
+    expect((error as NoctuaApiError).message).toBe('Transcript not available');
+  });
+
+  it('lists recent conversions', async () => {
+    mockRequestUrl.mockResolvedValue(
+      okResponse({ items: [{ id: 'c-1', status: 'completed' }], total: 1 })
+    );
+
+    const list = await makeClient().listConversions(50);
+
+    expect(list.items).toHaveLength(1);
+    expect(mockRequestUrl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://api.cast.noctua.uno/api/v1/conversions/?limit=50',
+        method: 'GET',
+      })
+    );
+  });
 });

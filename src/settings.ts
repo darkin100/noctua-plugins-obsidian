@@ -73,6 +73,27 @@ export class NoctuaSettingTab extends PluginSettingTab {
         },
       },
       {
+        name: 'Save transcripts',
+        desc: 'When an episode is ready, save its transcript as a note in your vault and link to it from the sent note.',
+        aliases: ['transcript', 'text'],
+        control: {
+          type: 'toggle',
+          key: 'saveTranscripts',
+          defaultValue: DEFAULT_SETTINGS.saveTranscripts,
+        },
+      },
+      {
+        name: 'Transcript folder',
+        desc: 'Folder that transcript notes are saved in. It is created if it does not exist.',
+        aliases: ['transcript', 'location', 'path'],
+        control: {
+          type: 'text',
+          key: 'transcriptFolder',
+          placeholder: DEFAULT_SETTINGS.transcriptFolder,
+          defaultValue: DEFAULT_SETTINGS.transcriptFolder,
+        },
+      },
+      {
         name: 'Connection',
         desc: 'Verify the API key and show your remaining credits.',
         aliases: ['test', 'credits'],
@@ -116,6 +137,13 @@ export class NoctuaSettingTab extends PluginSettingTab {
         break;
       case 'writeBackFrontmatter':
         this.plugin.settings.writeBackFrontmatter = Boolean(value);
+        break;
+      case 'saveTranscripts':
+        this.plugin.settings.saveTranscripts = Boolean(value);
+        break;
+      case 'transcriptFolder':
+        this.plugin.settings.transcriptFolder =
+          (typeof value === 'string' ? value.trim() : '') || DEFAULT_SETTINGS.transcriptFolder;
         break;
     }
     await this.plugin.saveSettings();

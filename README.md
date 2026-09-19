@@ -8,6 +8,11 @@ Send any note (or selection) to [Noctua](https://noctua.uno) and listen to it la
 - **Send selection to your podcast feed** — convert just the highlighted text
 - Shows progress while Noctua prepares the audio, and confirms when the episode is in your feed
 - Optionally writes `noctua_id` and `noctua_url` into the note's frontmatter so the same note isn't sent twice by accident
+- **Save episode transcripts to your vault** — optionally save the transcript automatically once an episode is ready, or on demand:
+  - **Save transcript of this note's episode** — for a note you've already sent (uses its `noctua_id`)
+  - **Save an episode transcript from your podcast feed** — pick any episode, including ones created from web articles or emails
+
+  Transcripts are saved as notes in the **Transcript folder** (default `Noctua transcripts`) with `noctua_transcript_of`, `noctua_url`, `source` and `created` properties. Saving the same episode again refreshes the existing note rather than creating a duplicate. When sent-note marking is on, the sent note gets a `noctua_transcript` link to its transcript.
 - Works on desktop and mobile (requires Obsidian 1.13.0+)
 
 ## Setup
@@ -23,6 +28,7 @@ This plugin sends data to the Noctua API (`api.cast.noctua.uno`) — this is its
 
 - **What is sent**: the content of the note (or selection) you choose to send, its title, and an `obsidian://` link containing your vault name and the note's path (stored with the episode to identify its source; it is not included in your podcast RSS feed or on public share pages)
 - **When**: only when you run a send command; nothing is sent in the background
+- **What is downloaded**: episode transcripts, and your episode list when you pick an episode to save a transcript from — only when you run a transcript command or have **Save transcripts** turned on
 - **Telemetry**: none — the plugin collects no analytics or usage data
 
 A **Noctua account is required**, and each conversion consumes one Noctua credit (new accounts include free credits; more can be purchased). See Noctua's [privacy policy](https://noctua.uno/privacy/) and [terms](https://noctua.uno/terms/).
