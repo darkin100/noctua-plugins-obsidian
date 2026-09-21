@@ -1,6 +1,6 @@
 # Noctua for Obsidian
 
-Send any note (or selection) to [Noctua](https://noctua.uno) and listen to it later as an episode in your personal podcast feed.
+Send any note (or selection) to [Noctua](https://noctua.uno) and listen to it later as an episode in your personal podcast feed. Noctua turns your text into natural-sounding audio with text-to-speech (TTS), so you can listen to your notes on the go, and you can save episode transcripts back into your vault.
 
 ## What it does
 

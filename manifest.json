@@ -3,7 +3,7 @@
   "name": "Noctua",
   "version": "0.2.0",
   "minAppVersion": "1.13.0",
-  "description": "Send notes to Noctua to be converted into audio episodes in your personal podcast feed.",
+  "description": "Turn notes into audio with text-to-speech (TTS) and listen in your personal podcast feed. Save episode transcripts to your vault.",
   "author": "Glyn Darkin",
   "authorUrl": "https://noctua.uno",
   "isDesktopOnly": false

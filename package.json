@@ -1,7 +1,7 @@
 {
   "name": "obsidian-noctua",
   "version": "0.2.0",
-  "description": "Send notes to Noctua to be converted into audio episodes in your personal podcast feed.",
+  "description": "Turn notes into audio with text-to-speech (TTS) and listen in your personal podcast feed. Save episode transcripts to your vault.",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -13,9 +13,15 @@
   },
   "keywords": [
     "obsidian",
+    "obsidian-plugin",
     "noctua",
+    "text-to-speech",
+    "tts",
+    "audio",
     "podcast",
-    "text-to-speech"
+    "read-aloud",
+    "listen",
+    "transcript"
   ],
   "author": "Glyn Darkin",
   "license": "MIT",
