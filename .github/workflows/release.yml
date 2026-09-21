@@ -1,7 +1,7 @@
 name: Release
 
 # Obsidian installs plugins from GitHub release assets, so a release must
-# attach the built main.js alongside manifest.json. The tag must match
+# attach the built main.js alongside manifest.json and styles.css. The tag must match
 # manifest.json's version exactly, with no "v" prefix (e.g. 0.1.0).
 on:
   push:
@@ -52,6 +52,6 @@ jobs:
           subject-path: main.js
 
       - name: Create draft release
-        run: gh release create "$GITHUB_REF_NAME" --draft --title "$GITHUB_REF_NAME" --generate-notes main.js manifest.json
+        run: gh release create "$GITHUB_REF_NAME" --draft --title "$GITHUB_REF_NAME" --generate-notes main.js manifest.json styles.css
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

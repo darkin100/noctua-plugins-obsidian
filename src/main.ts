@@ -8,7 +8,8 @@ import {
   Plugin,
   TFile,
 } from 'obsidian';
-import { EpisodeSuggestModal } from './episode-modal';
+import { EpisodePickerModal } from './episode-modal';
+import { batchSummary, transcribableEpisodes } from './episode-list';
 import { NoctuaClient, NoctuaApiError, Conversion } from './noctua-client';
 import {
   buildSourceUrl,
@@ -110,8 +111,8 @@ export default class NoctuaPlugin extends Plugin {
 
     this.addCommand({
       id: 'import-transcript',
-      name: 'Save an episode transcript from your podcast feed',
-      callback: () => void this.pickEpisodeTranscript(),
+      name: 'Save episode transcripts from your podcast feed',
+      callback: () => void this.pickEpisodeTranscripts(),
     });
 
     this.registerEvent(
@@ -322,14 +323,15 @@ export default class NoctuaPlugin extends Plugin {
     }
   }
 
-  /** Command: pick any episode in the feed and save its transcript. */
-  private async pickEpisodeTranscript() {
+  /** Command: list the episodes in the feed and save transcripts for the chosen ones. */
+  private async pickEpisodeTranscripts() {
     const notice = new Notice('Loading your Noctua episodes…', 0);
     let episodes: Conversion[];
+    let total: number;
     try {
       const list = await this.client.listConversions();
-      // Failed conversions never produced content worth transcribing.
-      episodes = (list.items ?? []).filter((episode) => episode.status !== 'failed');
+      episodes = transcribableEpisodes(list.items);
+      total = Math.max(list.total ?? 0, list.items?.length ?? 0);
     } catch (error) {
       notice.hide();
       new Notice(transcriptErrorMessage(error), 10_000);
@@ -340,9 +342,56 @@ export default class NoctuaPlugin extends Plugin {
       new Notice('There are no episodes in your Noctua podcast feed yet.', 6_000);
       return;
     }
-    new EpisodeSuggestModal(this.app, episodes, (episode) => {
-      void this.saveTranscriptById(episode.id);
-    }).open();
+    const savedIds = this.savedTranscriptIds();
+    new EpisodePickerModal(
+      this.app,
+      episodes,
+      total,
+      (episode) => savedIds.has(episode.id),
+      (chosen) => void this.saveTranscripts(chosen)
+    ).open();
+  }
+
+  /** Save (or refresh) the transcripts of several episodes, one at a time. */
+  private async saveTranscripts(episodes: Conversion[]) {
+    const notice = new Notice('Saving transcripts…', 0);
+    const saved: TFile[] = [];
+    const failures: { title: string; reason: string }[] = [];
+
+    for (const [index, episode] of episodes.entries()) {
+      const title = episode.title?.trim() || 'Untitled episode';
+      notice.setMessage(
+        `Saving transcript ${index + 1} of ${episodes.length}: “${title}”…`
+      );
+      try {
+        const shareUrl =
+          episode.status === 'completed'
+            ? await this.client.getShareLink(episode.id).catch(() => null)
+            : null;
+        saved.push(await this.saveTranscript(episode, { shareUrl }));
+      } catch (error) {
+        failures.push({ title, reason: transcriptErrorMessage(error) });
+        // A rejected API key fails every remaining episode too.
+        if (error instanceof NoctuaApiError && error.status === 401) {
+          for (const rest of episodes.slice(index + 1)) {
+            failures.push({
+              title: rest.title?.trim() || 'Untitled episode',
+              reason: 'skipped',
+            });
+          }
+          break;
+        }
+      }
+    }
+
+    notice.hide();
+    new Notice(
+      batchSummary(saved.length, failures, normaliseFolder(this.settings.transcriptFolder)),
+      failures.length ? 15_000 : 8_000
+    );
+    if (episodes.length === 1 && saved.length === 1) {
+      await this.app.workspace.getLeaf(false).openFile(saved[0]);
+    }
   }
 
   /**
@@ -406,6 +455,17 @@ export default class NoctuaPlugin extends Plugin {
     }
 
     return transcriptFile;
+  }
+
+  /** Conversion ids that already have a transcript note in the vault. */
+  private savedTranscriptIds(): Set<string> {
+    const ids = new Set<string>();
+    for (const file of this.app.vault.getMarkdownFiles()) {
+      const id: unknown =
+        this.app.metadataCache.getFileCache(file)?.frontmatter?.noctua_transcript_of;
+      if (typeof id === 'string') ids.add(id);
+    }
+    return ids;
   }
 
   private findTranscriptNote(conversionId: string): TFile | null {
