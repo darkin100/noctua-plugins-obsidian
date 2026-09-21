@@ -14,6 +14,16 @@ describe('transcriptBasename', () => {
     expect(transcriptBasename('A/B: "C" #1 [draft]?')).toBe('A B C 1 draft');
   });
 
+  it('replaces control characters', () => {
+    expect(transcriptBasename('Line one\nLine\ttwo\u0000\u001f end')).toBe(
+      'Line one Line two end'
+    );
+  });
+
+  it('keeps characters outside the control range, including emoji', () => {
+    expect(transcriptBasename('Café 🎧 notes')).toBe('Café 🎧 notes');
+  });
+
   it('strips leading and trailing dots', () => {
     expect(transcriptBasename('...hidden. ')).toBe('hidden');
   });

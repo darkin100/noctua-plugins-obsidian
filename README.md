@@ -75,6 +75,16 @@ This plugin sends data to the Noctua API (`api.cast.noctua.uno`) — this is its
 - **What is downloaded**: episode transcripts, and your episode list when you open the episode picker — only when you run a transcript command or have **Save transcripts** turned on
 - **Telemetry**: none — the plugin collects no analytics or usage data
 
+### Vault access
+
+The plugin reads and writes files in your vault only through Obsidian's API, and only for these tasks:
+
+- **Reading** the note you send (or the selected text).
+- **Writing** `noctua_id`, `noctua_url` and `noctua_transcript` to the frontmatter of a sent note (if sent-note marking is on), and creating or updating transcript notes in your **Transcript folder**.
+- **Listing the Markdown files in your vault** when it saves a transcript or opens the episode picker. It checks each file's frontmatter for a `noctua_transcript_of` property to find transcripts you've already saved. That's how saving the same episode twice updates your existing note (even if you've moved it out of the transcript folder), and how the picker marks episodes as *transcript saved*. It reads the frontmatter from Obsidian's metadata cache, not the note contents.
+
+None of this vault information is sent to Noctua or anywhere else. The only data sent is what's listed above.
+
 A **Noctua account is required**, and each conversion consumes one Noctua credit (new accounts include free credits; more can be purchased). See Noctua's [privacy policy](https://noctua.uno/privacy/) and [terms](https://noctua.uno/terms/).
 
 Your API key is stored in Obsidian's secret storage, so it is never written to the plugin's `data.json` inside your vault and is not picked up by vault syncs or backups. Secret storage needs Obsidian 1.11.4+, and the plugin's settings use the declarative settings API added in 1.13.0, so 1.13.0 is the minimum supported version. A key saved by an earlier plugin version is migrated into secret storage and removed from `data.json` on first run.

@@ -12,10 +12,8 @@ const MAX_FILENAME_CHARS = 100;
  * are invalid in file names on some platform or that break Obsidian links.
  */
 export function transcriptBasename(title: string | null | undefined): string {
-  const cleaned = (title ?? '')
+  const cleaned = replaceControlCharacters(title ?? '')
     .replace(/[\\/:*?"<>|#^[\]]/g, ' ')
-    // Control characters are invalid in file names on Windows.
-    .replace(/[\u0000-\u001f]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     // Leading dots hide files; trailing dots/spaces are stripped by Windows.
@@ -23,6 +21,15 @@ export function transcriptBasename(title: string | null | undefined): string {
     .replace(/[.\s]+$/, '');
   const truncated = cleaned.slice(0, MAX_FILENAME_CHARS).trim();
   return truncated || 'Untitled transcript';
+}
+
+/**
+ * Replace control characters (U+0000–U+001F), which are invalid in file
+ * names on Windows, with spaces. Done by code point rather than with a
+ * regex, because control characters in a regex trip lint checks.
+ */
+function replaceControlCharacters(text: string): string {
+  return Array.from(text, (char) => (char.charCodeAt(0) < 0x20 ? ' ' : char)).join('');
 }
 
 /** Normalise the configured folder: no leading/trailing slashes, `/` for root. */
