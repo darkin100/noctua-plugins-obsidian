@@ -15,6 +15,18 @@ Send any note (or selection) to [Noctua](https://noctua.uno) and listen to it la
   Transcripts are saved as notes in the **Transcript folder** (default `Noctua transcripts`) with `noctua_transcript_of`, `noctua_url`, `source` and `created` properties. Saving the same episode again refreshes the existing note rather than creating a duplicate. When sent-note marking is on, the sent note gets a `noctua_transcript` link to its transcript.
 - Works on desktop and mobile (requires Obsidian 1.13.0+)
 
+## Installation
+
+The plugin is published in the Obsidian community plugin directory: [Noctua on community.obsidian.md](https://community.obsidian.md/plugins/noctua).
+
+To install it from inside Obsidian:
+
+1. Open **Settings → Community plugins**. If you see **Restricted mode is on**, click **Turn on community plugins**.
+2. Click **Browse**, search for **Noctua** and click **Install**.
+3. Click **Enable**, then follow [Setup](#setup) below.
+
+To run a build from this repository instead, see [Installing a local build in Obsidian](#installing-a-local-build-in-obsidian).
+
 ## Setup
 
 1. Sign in at [cast.noctua.uno](https://cast.noctua.uno) and open **Settings → API keys**
@@ -76,7 +88,54 @@ npm test         # vitest unit tests
 npm run build    # type-check + production bundle (main.js)
 ```
 
-To test in a vault, copy `manifest.json`, `styles.css` and the built `main.js` into `<vault>/.obsidian/plugins/noctua/`, then enable the plugin in **Settings → Community plugins**.
+### Installing a local build in Obsidian
+
+Obsidian loads community plugins from `<vault>/.obsidian/plugins/<plugin id>/`. For this plugin the folder must be named `noctua`, to match the `id` in `manifest.json`. The folder needs three files: `main.js`, `manifest.json` and `styles.css`.
+
+It's best to test in a separate vault rather than your everyday one. If the [published version](https://community.obsidian.md/plugins/noctua) is already installed in that vault, the local build replaces it, because both use the same folder.
+
+**1. Build the plugin**
+
+```bash
+npm install
+npm run build    # writes main.js to the repository root
+```
+
+**2. Put the plugin in your vault** using one of these options.
+
+- **Option A: link the repository (best while developing).** Obsidian then loads the files straight from your checkout, so every rebuild is picked up:
+
+  ```bash
+  mkdir -p "<vault>/.obsidian/plugins"
+  ln -s "$(pwd)" "<vault>/.obsidian/plugins/noctua"
+  ```
+
+  Obsidian writes the plugin's settings to `data.json` in this folder. That file is in `.gitignore`, so it won't be committed.
+
+- **Option B: copy the files.**
+
+  ```bash
+  mkdir -p "<vault>/.obsidian/plugins/noctua"
+  cp main.js manifest.json styles.css "<vault>/.obsidian/plugins/noctua/"
+  ```
+
+  Copy the files again after each build.
+
+`.obsidian` is a hidden folder. On macOS, press **Cmd + Shift + .** in Finder to show hidden files.
+
+**3. Enable the plugin in Obsidian**
+
+1. Open **Settings → Community plugins**.
+2. If you see **Restricted mode is on**, click **Turn on community plugins**.
+3. Under **Installed plugins**, find **Noctua** and switch it on. If it isn't listed, click the refresh icon next to **Installed plugins**.
+4. Follow [Setup](#setup) to add your API key. The key is kept in Obsidian's secret storage on this device, not in the plugin folder.
+
+**4. Load your changes**
+
+- Run `npm run dev` to rebuild `main.js` automatically whenever you save a source file.
+- Obsidian doesn't reload a plugin by itself. After a rebuild, switch **Noctua** off and on again in **Settings → Community plugins**, or run **Reload app without saving** from the command palette.
+- If you used Option B, copy the files into the vault again first.
+- Open the developer console (**Cmd + Option + I** on macOS, **Ctrl + Shift + I** on Windows/Linux) to see errors from the plugin.
 
 ### Releasing
 
