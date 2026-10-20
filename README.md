@@ -73,6 +73,7 @@ This plugin sends data to the Noctua API (`api.cast.noctua.uno`) — this is its
 - **What is sent**: the content of the note (or selection) you choose to send, its title, and an `obsidian://` link containing your vault name and the note's path (stored with the episode to identify its source; it is not included in your podcast RSS feed or on public share pages)
 - **When**: only when you run a send command; nothing is sent in the background
 - **What is downloaded**: episode transcripts, and your episode list when you open the episode picker — only when you run a transcript command or have **Save transcripts** turned on
+- **Client identifier**: each request carries an `X-Noctua-Client: obsidian/<plugin version>` header, so Noctua can tell which app an episode came from
 - **Telemetry**: none — the plugin collects no analytics or usage data
 
 ### Vault access

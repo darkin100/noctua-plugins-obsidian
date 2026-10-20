@@ -6,7 +6,7 @@ vi.mock('obsidian', () => ({
   requestUrl: mockRequestUrl,
 }));
 
-import { NoctuaClient, NoctuaApiError } from '../src/noctua-client';
+import { NoctuaClient, NoctuaApiError, clientHeader } from '../src/noctua-client';
 
 function makeClient(apiKey = 'nct_test-key', baseUrl = 'https://api.cast.noctua.uno') {
   return new NoctuaClient(() => ({ baseUrl, apiKey }));
@@ -40,6 +40,28 @@ describe('NoctuaClient', () => {
         }),
       })
     );
+  });
+
+  it('identifies itself with the X-Noctua-Client header and plugin version', async () => {
+    mockRequestUrl.mockResolvedValue(okResponse({ balance: 3 }));
+    const client = new NoctuaClient(() => ({
+      baseUrl: 'https://api.cast.noctua.uno',
+      apiKey: 'nct_k',
+      clientVersion: '0.3.0',
+    }));
+
+    await client.getCreditBalance();
+
+    expect(mockRequestUrl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'X-Noctua-Client': 'obsidian/0.3.0' }),
+      })
+    );
+  });
+
+  it('falls back to a bare client name when the version is unknown', () => {
+    expect(clientHeader()).toBe('obsidian');
+    expect(clientHeader('1.2.3')).toBe('obsidian/1.2.3');
   });
 
   it('strips trailing slashes from the base URL', async () => {
