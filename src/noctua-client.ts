@@ -3,6 +3,13 @@ import { requestUrl, RequestUrlResponse } from 'obsidian';
 export interface NoctuaClientConfig {
   baseUrl: string;
   apiKey: string;
+  /** Plugin version, reported to Noctua so it can attribute requests to this client. */
+  clientVersion?: string;
+}
+
+/** Value of the X-Noctua-Client header: identifies the plugin (and its version) to Noctua. */
+export function clientHeader(version?: string): string {
+  return version ? `obsidian/${version}` : 'obsidian';
 }
 
 export interface Conversion {
@@ -69,7 +76,7 @@ export class NoctuaClient {
     path: string,
     body?: unknown
   ): Promise<RequestUrlResponse> {
-    const { baseUrl, apiKey } = this.getConfig();
+    const { baseUrl, apiKey, clientVersion } = this.getConfig();
     if (!apiKey) {
       throw new NoctuaApiError(
         'No API key configured. Create one in the Noctua web app (Settings → API keys) and paste it into the plugin settings.',
@@ -83,6 +90,7 @@ export class NoctuaClient {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'X-Noctua-Client': clientHeader(clientVersion),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
       throw: false,

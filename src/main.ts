@@ -55,6 +55,7 @@ export default class NoctuaPlugin extends Plugin {
   client = new NoctuaClient(() => ({
     baseUrl: this.settings.baseUrl,
     apiKey: this.apiKey,
+    clientVersion: this.manifest.version,
   }));
 
   async onload() {
